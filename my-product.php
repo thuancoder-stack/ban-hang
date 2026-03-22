@@ -288,7 +288,24 @@ if (isset($_GET['status'])) {
 							<i class="fa fa-plus"></i> Add Product
 						</a>
 					</div>
-				
+				<?php
+					$statusMessage = "";
+					if (isset($_GET['status'])) {
+						if ($_GET['status'] === "added") {
+							$statusMessage = "Them san pham thanh cong.";
+						} elseif ($_GET['status'] === "updated") {
+							$statusMessage = "Cap nhat san pham thanh cong.";
+						} elseif ($_GET['status'] === "deleted") {
+							$statusMessage = "Xoa san pham thanh cong.";
+						} elseif ($_GET['status'] === "invalid_id") {
+							$statusMessage = "ID san pham khong hop le.";
+						} elseif ($_GET['status'] === "not_found") {
+							$statusMessage = "Khong tim thay san pham can sua.";
+						} elseif ($_GET['status'] === "update_failed") {
+							$statusMessage = "Cap nhat that bai. Vui long thu lai.";
+						}
+					}
+				?>
 					<div class="table-responsive cart_info">
 						<table class="table table-condensed">
 							<thead>
