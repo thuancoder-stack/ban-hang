@@ -3,7 +3,8 @@
 	if(!isset($_SESSION['user'])){
     header("Location: login.php");
     exit();
-}
+	}	
+	
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -96,13 +97,12 @@
 								<li><a href=""><i class="fa fa-star"></i> Wishlist</a></li>
 								<li><a href="checkout.html"><i class="fa fa-crosshairs"></i> Checkout</a></li>
 								<li><a href="cart.html"><i class="fa fa-shopping-cart"></i> Cart</a></li>
-								<?php if(isset($_SESSION['user'])): ?>
-								<!-- ĐÃ LOGIN -->
-								<li><a href="login.php"><i class="fa fa-lock"></i> Logout</a></li>								
-								<?php else: ?>
-								<!-- CHƯA LOGIN -->	
-								
-								<?php endif; ?>
+								<?php if(isset($_SESSION['user_id'])): ?>
+                                    <li><a href="account.php"><i class="fa fa-user"></i> Account</a></li>
+                                    <li><a href="logout.php"><i class="fa fa-lock"></i> Logout</a></li>
+                                <?php else: ?>
+                                    <li><a href="login.php"><i class="fa fa-lock"></i> Login</a></li>
+                                <?php endif; ?>
 							</ul>
 						</div>
 					</div>
@@ -132,12 +132,11 @@
 										<li><a href="checkout.html">Checkout</a></li> 
 										<li><a href="cart.html">Cart</a></li> 
 										<?php if(isset($_SESSION['user_id'])): ?>
-										<!-- ĐÃ LOGIN -->
-														
-									<?php else: ?>
-										<!-- CHƯA LOGIN -->
-										
-									<?php endif; ?>
+                                    <li><a href="account.php"><i class="fa fa-user"></i> Account</a></li>
+                                    <li><a href="logout.php"><i class="fa fa-lock"></i> Logout</a></li>
+                                <?php else: ?>
+                                    <li><a href="login.php"><i class="fa fa-lock"></i> Login</a></li>
+                                <?php endif; ?>
                                     </ul>
                                 </li> 
 								<li class="dropdown"><a href="#" >Blog<i class="fa fa-angle-down"></i></a>
@@ -172,7 +171,7 @@
 							
 							<div class="panel panel-default">
 								<div class="panel-heading">
-									<h4 class="panel-title"><a href="#">account</a></h4>
+									<h4 class="panel-title"><a href="account.php">account</a></h4>
 								</div>
 							</div>
 							<div class="panel panel-default">
@@ -191,11 +190,12 @@
 						<h2 class="title text-center">Update user</h2>
 						 <div class="signup-form"><!--sign up form-->
 						<h2>New User Signup!</h2>
-						<form action="#">
-							<input type="text" placeholder="Name"/>
-							<input type="email" placeholder="Email Address"/>
-							<input type="password" placeholder="Password"/>
-							<button type="submit" class="btn btn-default">Signup</button>
+						<form action="update.php" method="post">
+							<input type="hidden" name="id" value="<?= $_SESSION['user']['id']; ?>"/>
+							<input type="text" name="name" value="<?= $_SESSION['user']['name']; ?>"/>
+							<input type="email" name="email" value="<?= $_SESSION['user']['email']; ?>"/>
+							<input type="password" name="password" placeholder="New Password"/>
+							<button type="submit" name="submit" class="btn btn-default">Update</button>
 						</form>
 					</div>
 					</div>
