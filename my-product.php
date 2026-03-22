@@ -97,15 +97,12 @@ if(!isset($_SESSION['user'])){
 								<li><a href=""><i class="fa fa-star"></i> Wishlist</a></li>
 								<li><a href="checkout.html"><i class="fa fa-crosshairs"></i> Checkout</a></li>
 								<li><a href="cart.html"><i class="fa fa-shopping-cart"></i> Cart</a></li>
-								<?php if(isset($_SESSION['user'])): ?>
-								<!-- ĐÃ LOGIN -->
-								<li><a href="account.php">Account</a></li>
-								<li onclick="<?php session_destroy(); header('Location: login.php'); exit(); ?>">
-									<a><i class="fa fa-lock"></i> Logout</a></li>
-								<?php else: ?>
-								<!-- CHƯA LOGIN -->	
-								<li class=""><a href="login.php"><i class="fa fa-lock"></i> Login</a></li>
-								<?php endif; ?>
+								<?php if(isset($_SESSION['user_id'])): ?>
+                                    <li><a href="account.php"><i class="fa fa-user"></i> Account</a></li>
+                                    <li><a href="logout.php"><i class="fa fa-lock"></i> Logout</a></li>
+                                <?php else: ?>
+                                    <li><a href="login.php"><i class="fa fa-lock"></i> Login</a></li>
+                                <?php endif; ?>
 							</ul>
 						</div>
 					</div>
@@ -135,18 +132,16 @@ if(!isset($_SESSION['user'])){
 										<li><a href="checkout.html">Checkout</a></li> 
 										<li><a href="cart.html">Cart</a></li> 
 										<?php if(isset($_SESSION['user_id'])): ?>
-										<!-- ĐÃ LOGIN -->
-										<li><a href="account.php">Account</a></li>
-										<li onclick="<?php unset($_SESSION['user_id']); unset($_SESSION['user_name']); ?>"><a href="login.html"><i class="fa fa-lock"></i> Logout</a></li>								
-										<?php else: ?>
-										<!-- CHƯA LOGIN -->	
-										<li class=""><a href="login.html"><i class="fa fa-lock"></i> Login</a></li>
-										<?php endif; ?>
+                                    		<li><a href="account.php"><i class="fa fa-user"></i> Account</a></li>
+                                    		<li><a href="logout.php"><i class="fa fa-lock"></i> Logout</a></li>
+                                		<?php else: ?>
+                                    		<li><a href="login.php"><i class="fa fa-lock"></i> Login</a></li>
+                                		<?php endif; ?>
                                     </ul>
                                 </li> 
-								<li class="dropdown"><a href="#" class="active">Blog<i class="fa fa-angle-down"></i></a>
+								<li class="dropdown"><a href="#" class="">Blog<i class="fa fa-angle-down"></i></a>
                                     <ul role="menu" class="sub-menu">
-                                        <li><a href="blog.html" class="active">Blog List</a></li>
+                                        <li><a href="blog.html" class="">Blog List</a></li>
 										<li><a href="blog-single.html">Blog Single</a></li>
                                     </ul>
                                 </li> 
@@ -176,12 +171,12 @@ if(!isset($_SESSION['user'])){
 							
 							<div class="panel panel-default">
 								<div class="panel-heading">
-									<h4 class="panel-title"><a href="#">account</a></h4>
+									<h4 class="panel-title"><a href="account.php">account</a></h4>
 								</div>
 							</div>
 							<div class="panel panel-default">
 								<div class="panel-heading">
-									<h4 class="panel-title"><a href="#">My product</a></h4>
+									<h4 class="panel-title"><a href="my-product.php">My product</a></h4>
 								</div>
 							</div>
 							

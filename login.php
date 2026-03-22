@@ -1,6 +1,6 @@
 <?php
 session_start();
-if(isset($_SESSION['user_id'])){
+if(isset($_SESSION['user'])){
     header("Location: index.php");
     exit();
 }
@@ -18,7 +18,6 @@ if(isset($_POST['submit'])){
             $_SESSION['user'] = $row;
             $_SESSION['user_id'] = $row['id'];
             $_SESSION['user_name'] = $row['name'];
-            
             header("Location: index.php");
             exit();
         }else{
