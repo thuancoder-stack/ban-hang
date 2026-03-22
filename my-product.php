@@ -5,6 +5,82 @@ if(!isset($_SESSION['user'])){
     header("Location: login.php");
     exit();
 }
+
+include "connect.php";
+
+$userId = isset($_SESSION['user_id']) ? (int) $_SESSION['user_id'] : (int) $_SESSION['user']['id'];
+
+$createProductsTableSql = "CREATE TABLE IF NOT EXISTS products (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    price DECIMAL(10,2) NOT NULL DEFAULT 0,
+    image VARCHAR(255) DEFAULT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_user_id (user_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4";
+$con->query($createProductsTableSql);
+
+$existingProducts = 0;
+$countStmt = $con->prepare("SELECT COUNT(*) AS total FROM products WHERE user_id = ?");
+if ($countStmt) {
+    $countStmt->bind_param("i", $userId);
+    $countStmt->execute();
+    $countResult = $countStmt->get_result();
+    if ($countResult) {
+        $countRow = $countResult->fetch_assoc();
+        $existingProducts = (int) $countRow['total'];
+    }
+    $countStmt->close();
+}
+
+if ($existingProducts === 0) {
+    $defaultProducts = array(
+        array("Colorblock Scuba", 59.00, "images/cart/one.png"),
+        array("Blue Denim Shirt", 42.50, "images/cart/one.png"),
+        array("Classic Sneaker", 89.00, "images/cart/one.png")
+    );
+
+    $insertStmt = $con->prepare("INSERT INTO products (user_id, name, price, image) VALUES (?, ?, ?, ?)");
+    if ($insertStmt) {
+        foreach ($defaultProducts as $defaultProduct) {
+            $productName = $defaultProduct[0];
+            $productPrice = $defaultProduct[1];
+            $productImage = $defaultProduct[2];
+            $insertStmt->bind_param("isds", $userId, $productName, $productPrice, $productImage);
+            $insertStmt->execute();
+        }
+        $insertStmt->close();
+    }
+}
+
+$products = array();
+$listStmt = $con->prepare("SELECT id, name, price, image FROM products WHERE user_id = ? ORDER BY id DESC");
+if ($listStmt) {
+    $listStmt->bind_param("i", $userId);
+    $listStmt->execute();
+    $listResult = $listStmt->get_result();
+    if ($listResult) {
+        while ($row = $listResult->fetch_assoc()) {
+            $products[] = $row;
+        }
+    }
+    $listStmt->close();
+}
+
+$statusMessage = "";
+if (isset($_GET['status'])) {
+    if ($_GET['status'] === "updated") {
+        $statusMessage = "Cap nhat san pham thanh cong.";
+    } elseif ($_GET['status'] === "invalid_id") {
+        $statusMessage = "ID san pham khong hop le.";
+    } elseif ($_GET['status'] === "not_found") {
+        $statusMessage = "Khong tim thay san pham can sua.";
+    } elseif ($_GET['status'] === "update_failed") {
+        $statusMessage = "Cap nhat that bai. Vui long thu lai.";
+    }
+}
 ?>
     <!DOCTYPE html>
 <html lang="en">
@@ -21,6 +97,24 @@ if(!isset($_SESSION['user'])){
     <link href="css/animate.css" rel="stylesheet">
 	<link href="css/main.css" rel="stylesheet">
 	<link href="css/responsive.css" rel="stylesheet">
+	<style>
+    .cart_product img.product-thumb{
+        width: 120px;
+        height: 120px;
+        object-fit: cover;
+        display: block;
+        margin: 0 auto;
+    }
+
+    .cart_product{
+        width: 140px;
+    }
+
+    .cart_description h4{
+        margin-top: 10px;
+        margin-bottom: 10px;
+    }
+</style>
     <!--[if lt IE 9]>
     <script src="js/html5shiv.js"></script>
     <script src="js/respond.min.js"></script>
@@ -186,6 +280,15 @@ if(!isset($_SESSION['user'])){
 					</div>
 				</div>
 				<div class="col-sm-9">
+					<?php if ($statusMessage !== ""): ?>
+						<div class="alert alert-info"><?= htmlspecialchars($statusMessage); ?></div>
+					<?php endif; ?>
+					 <div style="margin-bottom: 10px; text-align: right; padding-right: 10px; padding-left: 10px; padding-top: 10px; padding-bottom: 10px; background-color: #f5f5f5; border-radius: 5px;">
+						<a href="add-product.php" class="btn btn-success">
+							<i class="fa fa-plus"></i> Add Product
+						</a>
+					</div>
+				
 					<div class="table-responsive cart_info">
 						<table class="table table-condensed">
 							<thead>
@@ -199,64 +302,33 @@ if(!isset($_SESSION['user'])){
 								</tr>
 							</thead>
 							<tbody>
-
-								
-								<tr>
-									<td class="cart_product">
-										<a href=""><img src="images/cart/one.png" alt=""></a>
-									</td>
-									<td class="cart_description">
-										<h4><a href="">Colorblock Scuba</a></h4>
-										
-									</td>
-									<td class="cart_price">
-										<p>$59</p>
-									</td>
-									
-									<td class="cart_total">
-										<a>edit</a>
-										<a>delete</a>
-									</td>
-									
-								</tr>
-								<tr>
-									<td class="cart_product">
-										<a href=""><img src="images/cart/one.png" alt=""></a>
-									</td>
-									<td class="cart_description">
-										<h4><a href="">Colorblock Scuba</a></h4>
-										
-									</td>
-									<td class="cart_price">
-										<p>$59</p>
-									</td>
-									
-									<td class="cart_total">
-										<a>edit</a>
-										<a>delete</a>
-									</td>
-									
-								</tr>
-								<tr>
-									<td class="cart_product">
-										<a href=""><img src="images/cart/one.png" alt=""></a>
-									</td>
-									<td class="cart_description">
-										<h4><a href="">Colorblock Scuba</a></h4>
-										
-									</td>
-									<td class="cart_price">
-										<p>$59</p>
-									</td>
-									
-									<td class="cart_total">
-										<a>edit</a>
-										<a>delete</a>
-									</td>
-									
-								</tr>
-
-
+								<?php if (empty($products)): ?>
+									<tr>
+										<td colspan="4" class="text-center">Ban chua co san pham nao.</td>
+									</tr>
+								<?php else: ?>
+									<?php foreach ($products as $product): ?>
+										<tr>
+											<td class="cart_product">
+												<?php
+													$imagePath = !empty($product['image']) ? $product['image'] : "images/cart/one.png";
+												?>
+												<a href="">
+													<img src="<?= htmlspecialchars($imagePath); ?>" alt="" class="product-thumb">
+												</a>
+											</td>
+											<td class="cart_description">
+												<h4><a href=""><?= htmlspecialchars($product['name']); ?></a></h4>
+											</td>
+											<td class="cart_price">
+												<p>$<?= number_format((float) $product['price'], 2); ?></p>
+											</td>
+											<td class="cart_total">
+												<a href="edit.php?id=<?= (int) $product['id']; ?>" class="btn btn-primary btn-xs">edit</a>
+											</td>
+										</tr>
+									<?php endforeach; ?>
+								<?php endif; ?>
 
 							
 							</tbody>
