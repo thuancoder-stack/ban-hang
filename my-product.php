@@ -5,24 +5,20 @@ if(!isset($_SESSION['user'])){
     header("Location: login.php");
     exit();
 }
-
+$statusMessage = "";
+if (isset($_GET['status'])) {
+	if ($_GET['status'] === "added") {
+		$statusMessage = "Add success.";
+	} elseif ($_GET['status'] === "updated") {
+		$statusMessage = "Update success.";
+	} elseif ($_GET['status'] === "deleted") {
+		$statusMessage = "Delete success.";
+	}
+}
 include "connect.php";
 
 $userId = isset($_SESSION['user_id']) ? (int) $_SESSION['user_id'] : (int) $_SESSION['user']['id'];
 
-$createProductsTableSql = "CREATE TABLE IF NOT EXISTS products (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
-    name VARCHAR(255) NOT NULL,
-    price DECIMAL(10,2) NOT NULL DEFAULT 0,
-    image VARCHAR(255) DEFAULT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    INDEX idx_user_id (user_id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4";
-$con->query($createProductsTableSql);
-
-$existingProducts = 0;
 $countStmt = $con->prepare("SELECT COUNT(*) AS total FROM products WHERE user_id = ?");
 if ($countStmt) {
     $countStmt->bind_param("i", $userId);
@@ -69,18 +65,6 @@ if ($listStmt) {
     $listStmt->close();
 }
 
-$statusMessage = "";
-if (isset($_GET['status'])) {
-    if ($_GET['status'] === "updated") {
-        $statusMessage = "Cap nhat san pham thanh cong.";
-    } elseif ($_GET['status'] === "invalid_id") {
-        $statusMessage = "ID san pham khong hop le.";
-    } elseif ($_GET['status'] === "not_found") {
-        $statusMessage = "Khong tim thay san pham can sua.";
-    } elseif ($_GET['status'] === "update_failed") {
-        $statusMessage = "Cap nhat that bai. Vui long thu lai.";
-    }
-}
 ?>
     <!DOCTYPE html>
 <html lang="en">
@@ -288,24 +272,7 @@ if (isset($_GET['status'])) {
 							<i class="fa fa-plus"></i> Add Product
 						</a>
 					</div>
-				<?php
-					$statusMessage = "";
-					if (isset($_GET['status'])) {
-						if ($_GET['status'] === "added") {
-							$statusMessage = "Them san pham thanh cong.";
-						} elseif ($_GET['status'] === "updated") {
-							$statusMessage = "Cap nhat san pham thanh cong.";
-						} elseif ($_GET['status'] === "deleted") {
-							$statusMessage = "Xoa san pham thanh cong.";
-						} elseif ($_GET['status'] === "invalid_id") {
-							$statusMessage = "ID san pham khong hop le.";
-						} elseif ($_GET['status'] === "not_found") {
-							$statusMessage = "Khong tim thay san pham can sua.";
-						} elseif ($_GET['status'] === "update_failed") {
-							$statusMessage = "Cap nhat that bai. Vui long thu lai.";
-						}
-					}
-				?>
+				
 					<div class="table-responsive cart_info">
 						<table class="table table-condensed">
 							<thead>
@@ -342,7 +309,12 @@ if (isset($_GET['status'])) {
 											</td>
 											<td class="cart_total">
 												<a href="edit.php?id=<?= (int) $product['id']; ?>" class="btn btn-primary btn-xs">edit</a>
-											</td>
+												<a href="delete-product.php?id=<?= (int) $product['id']; ?>"
+												   class="btn btn-danger btn-xs"
+												   onclick="return confirm('Ban co chac muon xoa san pham nay khong?');">
+												   delete
+												</a>
+</td>
 										</tr>
 									<?php endforeach; ?>
 								<?php endif; ?>

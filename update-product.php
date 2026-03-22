@@ -5,7 +5,12 @@ if (!isset($_SESSION['user'])) {
     header("Location: login.php");
     exit();
 }
-
+$statusMessage = "";
+if (isset($_GET['status'])) {
+    if ($_GET['status'] === "updated") {
+        $statusMessage = "Update success.";
+    } 
+}
 include "connect.php";
 
 $userId = isset($_SESSION['user_id']) ? (int) $_SESSION['user_id'] : (int) $_SESSION['user']['id'];

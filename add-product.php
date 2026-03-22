@@ -5,25 +5,14 @@ if (!isset($_SESSION['user'])) {
     header("Location: login.php");
     exit();
 }
-
-include "connect.php";
-
-$userId = isset($_SESSION['user_id']) ? (int) $_SESSION['user_id'] : (int) $_SESSION['user']['id'];
-
 $statusMessage = "";
 if (isset($_GET['status'])) {
     if ($_GET['status'] === "added") {
-        $statusMessage = "Them san pham thanh cong.";
-    } elseif ($_GET['status'] === "updated") {
-        $statusMessage = "Cap nhat san pham thanh cong.";
-    } elseif ($_GET['status'] === "invalid_id") {
-        $statusMessage = "ID san pham khong hop le.";
-    } elseif ($_GET['status'] === "not_found") {
-        $statusMessage = "Khong tim thay san pham can sua.";
-    } elseif ($_GET['status'] === "update_failed") {
-        $statusMessage = "Cap nhat that bai. Vui long thu lai.";
-    }
+        $statusMessage = "Add success.";
+    } 
 }
+include "connect.php";
+$userId = isset($_SESSION['user_id']) ? (int) $_SESSION['user_id'] : (int) $_SESSION['user']['id'];
 ?>
 <!DOCTYPE html>
 <html lang="en">
