@@ -2,7 +2,7 @@
 	$servername = "localhost";
 	$username = "root";
 	$password = "";
-	$database = "ban-hang";
+	$database = "ban_hang";
 	
 	
 	$con = new mysqli($servername, $username, $password, $database);

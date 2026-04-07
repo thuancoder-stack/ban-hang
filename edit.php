@@ -1,4 +1,4 @@
-<?php
+<!-- <?php
 session_start();
 
 if (!isset($_SESSION['user'])) {
@@ -431,4 +431,4 @@ if (isset($_GET['status'])) {
 <script src="js/jquery.prettyPhoto.js"></script>
 <script src="js/main.js"></script>
 </body>
-</html>
+</html> -->

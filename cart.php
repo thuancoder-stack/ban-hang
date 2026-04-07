@@ -1,19 +1,29 @@
 <?php
 session_start();
+// Kiểm tra đăng nhập
 if (!isset($_SESSION['user']['id'])) {
-    header("Location: login.php");
+    header('Location: login.php');
     exit();
 }
-
-
+if (!isset($_SESSION['CART'])) {
+    $_SESSION['CART'] = [];
+}
+$cart = $_SESSION['CART'];
+$subtotal = 0;
+$total = 0;
+$eco_tax = 2;
+$cartcount = 0;
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add Product | E-Shopper</title>
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>Cart | E-Shopper</title>
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <link href="css/font-awesome.min.css" rel="stylesheet">
     <link href="css/prettyPhoto.css" rel="stylesheet">
@@ -21,12 +31,23 @@ if (!isset($_SESSION['user']['id'])) {
     <link href="css/animate.css" rel="stylesheet">
     <link href="css/main.css" rel="stylesheet">
     <link href="css/responsive.css" rel="stylesheet">
+    <!--[if lt IE 9]>
+    <script src="js/html5shiv.js"></script>
+    <script src="js/respond.min.js"></script>
+    <![endif]-->
     <link rel="shortcut icon" href="images/ico/favicon.ico">
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="images/ico/apple-touch-icon-144-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="images/ico/apple-touch-icon-114-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="images/ico/apple-touch-icon-72-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" href="images/ico/apple-touch-icon-57-precomposed.png">
 </head>
+<!--/head-->
 
 <body>
     <header id="header">
+        <!--header-->
         <div class="header_top">
+            <!--header_top-->
             <div class="container">
                 <div class="row">
                     <div class="col-sm-6">
@@ -51,8 +72,10 @@ if (!isset($_SESSION['user']['id'])) {
                 </div>
             </div>
         </div>
+        <!--/header_top-->
 
         <div class="header-middle">
+            <!--header-middle-->
             <div class="container">
                 <div class="row">
                     <div class="col-md-4 clearfix">
@@ -88,12 +111,14 @@ if (!isset($_SESSION['user']['id'])) {
                     <div class="col-md-8 clearfix">
                         <div class="shop-menu clearfix pull-right">
                             <ul class="nav navbar-nav">
+                                <li><a href=""><i class="fa fa-user"></i> Account</a></li>
                                 <li><a href=""><i class="fa fa-star"></i> Wishlist</a></li>
                                 <li><a href="checkout.html"><i class="fa fa-crosshairs"></i> Checkout</a></li>
-                                <li><a href="cart.html"><i class="fa fa-shopping-cart"></i> Cart</a></li>
-                                <?php if (isset($_SESSION['user_id']) || isset($_SESSION['user'])): ?>
-                                <li><a href="account.php"><i class="fa fa-user"></i> Account</a></li>
-                                <li><a href="logout.php"><i class="fa fa-lock"></i> Logout</a></li>
+                                <li><a href="cart.php"><i class="fa fa-shopping-cart"></i> Cart(<span class="cart-count"><?php echo array_sum(array_column($_SESSION['CART'], 'qty')); ?></span>)
+                                    </a></li>
+
+                                <?php if (isset($_SESSION['user']['id'])): ?>
+                                <li><a href="logout.php"><i class="fa fa-sign-out"></i> Logout</a></li>
                                 <?php else: ?>
                                 <li><a href="login.php"><i class="fa fa-lock"></i> Login</a></li>
                                 <?php endif; ?>
@@ -103,8 +128,10 @@ if (!isset($_SESSION['user']['id'])) {
                 </div>
             </div>
         </div>
+        <!--/header-middle-->
 
         <div class="header-bottom">
+            <!--header-bottom-->
             <div class="container">
                 <div class="row">
                     <div class="col-sm-9">
@@ -125,13 +152,8 @@ if (!isset($_SESSION['user']['id'])) {
                                         <li><a href="shop.html">Products</a></li>
                                         <li><a href="product-details.html">Product Details</a></li>
                                         <li><a href="checkout.html">Checkout</a></li>
-                                        <li><a href="cart.html">Cart</a></li>
-                                        <?php if (isset($_SESSION['user_id']) || isset($_SESSION['user'])): ?>
-                                        <li><a href="account.php"><i class="fa fa-user"></i> Account</a></li>
-                                        <li><a href="logout.php"><i class="fa fa-lock"></i> Logout</a></li>
-                                        <?php else: ?>
-                                        <li><a href="login.php"><i class="fa fa-lock"></i> Login</a></li>
-                                        <?php endif; ?>
+                                        <li><a href="cart.php" class="active">Cart</a></li>
+                                        <li><a href="login.php">Login</a></li>
                                     </ul>
                                 </li>
                                 <li class="dropdown"><a href="#">Blog<i class="fa fa-angle-down"></i></a>
@@ -153,92 +175,168 @@ if (!isset($_SESSION['user']['id'])) {
                 </div>
             </div>
         </div>
+        <!--/header-bottom-->
     </header>
+    <!--/header-->
 
-    <section>
+    <section id="cart_items">
         <div class="container">
-            <div class="row">
-                <div class="col-sm-3">
-                    <div class="left-sidebar">
-                        <h2>Account</h2>
-                        <div class="panel-group category-products" id="accordian">
-                            <div class="panel panel-default">
-                                <div class="panel-heading">
-                                    <h4 class="panel-title"><a href="account.php">account</a></h4>
-                                </div>
-                            </div>
-                            <div class="panel panel-default">
-                                <div class="panel-heading">
-                                    <h4 class="panel-title"><a href="my-product.php">My product</a></h4>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <?php
-                if (isset($_POST['submit'])) {
-                    if (empty($_POST['name']) || empty($_POST['price']) || empty($_FILES['image']['name'])) {
-                        echo "<script>alert('Please fill in all fields');</script>";
-                    } else {
-                         if (!empty($_FILES['image']['name'])) {
-                            // Lấy thông tin file
-                            $name     = $_FILES['image']['name'];       // tên file
-                            $type     = $_FILES['image']['type'];       // kiểu file (image/png,...)
-                            $tmp_name = $_FILES['image']['tmp_name'];   // file tạm
-                            $error    = $_FILES['image']['error'];      // 0 = không lỗi
-                            $size     = $_FILES['image']['size'];       // byte
-                        
-                            if ($error > 0) {
-                                echo "File Upload Bị Lỗi!";
-                            } else {
-                                // Di chuyển file từ tạm -> folder upload
-                                move_uploaded_file($tmp_name, './upload/' . $name);
-                                }
-                            }
-                        include "connect.php";
-                        $user_id = $_SESSION['user']['id'];
-                        $name = $_POST['name'];
-                        $price = $_POST['price'];
-                        $image = $_FILES['image']['name'];
-                        $select_insert="INSERT INTO products(user_id, name, price, image) VALUES ( '$user_id','$name', '$price', '$image')"; 
-                        $result=$con->query($select_insert);
-                        if($result){
-                        echo "Product added successfully";
-                        }else{
-                        echo "Failed to add product";
-                        }
-                    }
-                }
-                    
-                ?>
-                <div class="col-sm-9">
-
-                    <form method="POST" enctype="multipart/form-data">
-                        <div class="form-group">
-                            <input type="text" name="name" class="form-control" placeholder="Product Name">
-                        </div>
-
-                        <div class=" form-group">
-                            <input type="text" name="price" class="form-control" placeholder="Product Price">
-                        </div>
-
-                        <div class=" form-group">
-                            <input type="file" name="image" class="form-control">
-                        </div>
-
-                        <div ">
-                            <button type=" submit" name="submit" class=" btn-primary">Save Product</button>
-                            <a href="my-product.php">Back</a>
-                        </div>
-                    </form>
-                </div>
+            <div class="breadcrumbs">
+                <ol class="breadcrumb">
+                    <li><a href="#">Home</a></li>
+                    <li class="active">Shopping Cart</li>
+                </ol>
             </div>
+            <div class="table-responsive cart_info">
 
-        </div>
+                <table class="table table-condensed">
+                    <thead>
+                        <tr class="cart_menu">
+                            <td>Item</td>
+                            <td>Name</td>
+                            <td>Price</td>
+                            <td>Quantity</td>
+                            <td>Total</td>
+                            <td>Action</td>
+                        </tr>
+                    </thead>
+                    <tbody id="cart-table-body">
+                        <?php if (empty($cart)): ?>
+                        <div class="empty">Giỏ hàng đang trống</div>
+                        <?php else: ?>
+                        
+                        <?php foreach ($cart as $item):
+                                $price   = (float)$item['price'];
+								$qty = (int)($item['qty'] ?? 0);
+                                $lineTotal = $qty * $price;
+                                $subtotal += $lineTotal;
+                                $total += $lineTotal;
+                                $cartcount += $item['qty'];
+                                
+                            ?>
+                           
+                        <tr class="cart-item" data-id="<?php echo $item['id']; ?>">
+                            <td>
+                                <a>
+                                    <img src="<?php echo 'upload/' . htmlspecialchars($item['image']); ?>"
+                                        width="80" alt="">
+                                </a>
+                            </td>
+                            <td>
+                                <?php echo $item['name']; ?>
+                            </td>
+                            <td>
+                                <?php echo "$" .number_format($price, 0, ',', '.'); ?>
+                            </td>
+                            <td class="qty-cell">
+                                <a class="qty-minus btn btn-xs btn-default decrease-qty" data-id="<?php echo $item['id'] ?>">-</a>
+                                <input type="text" class="qty-input" value="<?php echo $item['qty'] ?>" size="2"
+                                    style="text-align:center">
+                                <a class="qty-plus btn btn-xs btn-default increase-qty" data-id="<?php echo $item['id'] ?>">+</a>
+                            </td>
+                            <td class="line-total">
+                                <?php echo "$".$lineTotal  ?>
+                                
+                            </td>
+                           <td class="remove">
+                                <a class="btn-danger remove-item" data-id="<?php echo $item['id'] ?>" href="">delete</a>
+                            </td>
+                        </tr>
+                        <?php endforeach; ?>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
+
+            </div>
         </div>
     </section>
+    <!--/#cart_items-->
+
+    <section id=" do_action">
+        <div class="container">
+            <div class="heading">
+                <h3>What would you like to do next?</h3>
+                <p>Choose if you have a discount code or reward points you want to use or would
+                    like to estimate your
+                    delivery cost.</p>
+            </div>
+            <div class="row">
+                <div class="col-sm-6">
+                    <div class="chose_area">
+                        <ul class="user_option">
+                            <li>
+                                <input type="checkbox">
+                                <label>Use Coupon Code</label>
+                            </li>
+                            <li>
+                                <input type="checkbox">
+                                <label>Use Gift Voucher</label>
+                            </li>
+                            <li>
+                                <input type="checkbox">
+                                <label>Estimate Shipping & Taxes</label>
+                            </li>
+                        </ul>
+                        <ul class="user_info">
+                            <li class="single_field">
+                                <label>Country:</label>
+                                <select>
+                                    <option>United States</option>
+                                    <option>Bangladesh</option>
+                                    <option>UK</option>
+                                    <option>India</option>
+                                    <option>Pakistan</option>
+                                    <option>Ucrane</option>
+                                    <option>Canada</option>
+                                    <option>Dubai</option>
+                                </select>
+
+                            </li>
+                            <li class="single_field">
+                                <label>Region / State:</label>
+                                <select>
+                                    <option>Select</option>
+                                    <option>Dhaka</option>
+                                    <option>London</option>
+                                    <option>Dillih</option>
+                                    <option>Lahore</option>
+                                    <option>Alaska</option>
+                                    <option>Canada</option>
+                                    <option>Dubai</option>
+                                </select>
+
+                            </li>
+                            <li class="single_field zip-field">
+                                <label>Zip Code:</label>
+                                <input type="text">
+                            </li>
+                        </ul>
+                        <a class="btn btn-default update" href="">Get Quotes</a>
+                        <a class="btn btn-default check_out" href="">Continue</a>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                   <?php $total = $subtotal + $eco_tax; ?>
+                    <div class="total_area">
+                        <ul class="total_list">
+                            <li >Cart Sub Total <span class="subtotal">$<?php echo $subtotal; ?></span></li>
+                            <li >Eco Tax <span class="eco-tax">$<?php echo $eco_tax; ?></span></li>
+                            <li >Shipping Cost <span class="shipping-cost">Free</span></li>
+                            <li >Total <span class="total">$<?php echo $total; ?></span></li>
+                        </ul>
+                    </div>
+                    <div class="total_area">
+                        <a class="btn btn-default update" href="index.php">Continue Shopping</a>
+                        <a class="btn btn-default check_out" href="">Check Out</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!--/#do_action-->
 
     <footer id="footer">
+        <!--Footer-->
         <div class="footer-top">
             <div class="container">
                 <div class="row">
@@ -330,7 +428,7 @@ if (!isset($_SESSION['user']['id'])) {
                                 <li><a href="">Contact Us</a></li>
                                 <li><a href="">Order Status</a></li>
                                 <li><a href="">Change Location</a></li>
-                                <li><a href="">FAQ’s</a></li>
+                                <li><a href="">FAQâ€™s</a></li>
                             </ul>
                         </div>
                     </div>
@@ -381,6 +479,7 @@ if (!isset($_SESSION['user']['id'])) {
                             </form>
                         </div>
                     </div>
+
                 </div>
             </div>
         </div>
@@ -388,20 +487,122 @@ if (!isset($_SESSION['user']['id'])) {
         <div class="footer-bottom">
             <div class="container">
                 <div class="row">
-                    <p class="pull-left">Copyright © 2013 E-SHOPPER Inc. All rights reserved.</p>
+                    <p class="pull-left">Copyright Â© 2013 E-SHOPPER Inc. All rights reserved.</p>
                     <p class="pull-right">Designed by <span><a target="_blank"
                                 href="http://www.themeum.com">Themeum</a></span></p>
                 </div>
             </div>
         </div>
+
     </footer>
+    <!--/Footer-->
+
+
 
     <script src="js/jquery.js"></script>
-    <script src="js/price-range.js"></script>
-    <script src="js/jquery.scrollUp.min.js"></script>
     <script src="js/bootstrap.min.js"></script>
+    <script src="js/jquery.scrollUp.min.js"></script>
     <script src="js/jquery.prettyPhoto.js"></script>
     <script src="js/main.js"></script>
+    <script>
+
+
+
+    document.querySelectorAll('.increase-qty').forEach(function(button) {
+        button.addEventListener('click', async function(e) {
+            e.preventDefault();
+            
+            let row = this.closest('.cart-item');
+            let id = this.dataset.id;            
+            console.log("ID sản phẩm được chọn tăng số lượng:", id);
+            
+            const response = await fetch(
+                    'ajax_increase.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        id: id
+                    })
+                });
+            const data = await response.json();
+            console.log(data);
+            console.log("Updated");
+            if (data.status) {
+            // update UI
+            row.querySelector('.qty-input').value = data.qty;
+            row.querySelector('.line-total').textContent ='$' + data.lineTotal;
+            document.querySelector('span.subtotal').textContent = '$' + data.subtotal;
+            document.querySelector('span.total').textContent = '$' + data.total;
+            document.querySelector('.cart-count').textContent = data.cartcount;
+            }
+        })
+    });
+    document.querySelectorAll('.decrease-qty').forEach(function(button) {
+        button.addEventListener('click', async function(e) {
+            e.preventDefault();
+            let row = this.closest('.cart-item');
+            let id = this.dataset.id;
+            console.log("ID sản phẩm được chọn giảm số lượng:", id);
+            const response = await fetch(
+                'ajax_decrease.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        id: id
+                    })
+                });
+            const data = await response.json();
+            console.log(data);
+            console.log("Updated");
+            if (data.status) {
+            // update UI
+            if (data.qty <= 0) {
+                row.remove();
+            } else {
+                row.querySelector('.qty-input').value = data.qty;
+                row.querySelector('.line-total').textContent ='$' + data.lineTotal;
+            }
+            document.querySelector('span.subtotal').textContent = '$' + data.subtotal;
+            document.querySelector('span.total').textContent = '$' + data.total;
+            document.querySelector('.cart-count').textContent = data.cartcount;
+             }
+        });
+    });
+ 
+    document.querySelectorAll('.remove-item').forEach(function(button) {
+        button.addEventListener('click', async function(e) {
+            e.preventDefault();
+            let row = this.closest('.cart-item');
+            const id = this.getAttribute('data-id');
+            console.log("ID sản phẩm được chọn xóa:", id);
+            const response = await fetch(
+                'ajax_delete_cart.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        id: id
+                    })
+                });
+            const data = await response.json();
+            console.log(data);
+            console.log("Deleted");
+            if (data.status) {
+            // update UI
+            row.remove();
+            document.querySelector('span.subtotal').textContent = '$' + data.subtotal;
+            document.querySelector('span.total').textContent = '$' + data.total;
+            document.querySelector('.cart-count').textContent = data.cartcount;
+            } 
+        });        
+    });
+   
+    </script>
 </body>
 
 </html>
